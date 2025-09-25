@@ -1,3 +1,5 @@
+/* eslint-disable node/no-unsupported-features/es-syntax */
+/* eslint-disable no-nested-ternary */
 const fs = require('fs');
 
 const path = require('path');
@@ -9,9 +11,9 @@ const filePath = path.join(
   '..',
   'dev-data',
   'data',
-  'tours-simple.json'
+  'tours-simple.json',
 );
-let tours = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+const tours = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
 const checkId = (req, res, next, val) => {
   if (!tours.find((el) => el.id === Number(val))) {
     return res.status(404).json({ status: 'fail', message: 'Invalid ID' });
@@ -36,6 +38,7 @@ const getTour = (req, res) => {
 
 const createTour = (req, res) => {
   const newId = tours.length > 0 ? tours[tours.length - 1].id + 1 : 1;
+  // eslint-disable-next-line no-unused-vars
   const { id, ...rest } = req.body;
   const newTour = { id: newId, ...rest };
 
@@ -58,6 +61,17 @@ const deleteTour = (req, res) => {
   tours.splice(index, 1);
   saveToFile(filePath, tours, res, 204);
 };
+const checkData = (req, res, next) => {
+  if (!req.body.price || !req.body.name) {
+    return res.status(400).json({
+      status: 'fail',
+      message: `missing ${
+        !req.body.price ? (!req.body.name ? 'name and price' : 'price') : 'name'
+      }`,
+    });
+  }
+  next();
+};
 
 module.exports = {
   getAllTours,
@@ -66,4 +80,5 @@ module.exports = {
   updateTour,
   deleteTour,
   checkId,
+  checkData,
 };

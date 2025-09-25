@@ -1,3 +1,4 @@
+/* eslint-disable node/no-unsupported-features/es-syntax */
 const fs = require('fs');
 const path = require('path');
 const saveToFile = require('../helpers/helpers');
@@ -7,9 +8,10 @@ const userFilePath = path.join(
   '..',
   'dev-data',
   'data',
-  'users.json'
+  'users.json',
 );
-let users = JSON.parse(fs.readFileSync(userFilePath, 'utf-8'));
+
+const users = JSON.parse(fs.readFileSync(userFilePath, 'utf-8'));
 
 const getAllUsers = (req, res) => {
   res.status(200).json({
@@ -20,7 +22,7 @@ const getAllUsers = (req, res) => {
 };
 
 const getUser = (req, res) => {
-  const mail = req.params.mail;
+  const { mail } = req.params;
   const user = users.find((el) => el.email === mail);
 
   if (!user)
